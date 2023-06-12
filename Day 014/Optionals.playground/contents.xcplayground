@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<playground version='6.0' target-platform='macos' buildActiveScheme='true' importAppTypes='true'>
+    <pages>
+        <page name='How to handle missing data with optionals'/>
+        <page name='How to unwrap optionals with guard'/>
+        <page name='How to unwrap optionals with nil coalescing'/>
+        <page name='How to handle multiple optionals using optional chaining'/>
+        <page name='How to handle function failure with optionals'/>
+        <page name='Checkpoint 09'/>
+    </pages>
+</playground>

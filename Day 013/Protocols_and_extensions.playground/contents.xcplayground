@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<playground version='6.0' target-platform='macos' buildActiveScheme='true' importAppTypes='true'>
+    <pages>
+        <page name='How to create and use protocols'/>
+        <page name='How to use opaque return types'/>
+        <page name='How to create and use extensions'/>
+        <page name='How to create and use protocol extensions'/>
+        <page name='Checkpoint 08'/>
+    </pages>
+</playground>

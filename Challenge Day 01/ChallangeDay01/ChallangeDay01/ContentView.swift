@@ -11,6 +11,7 @@ struct ContentView: View {
     @State private var inputTime: Double = 0
     @State private var inputType: TimeEnum = .hour
     @State private var outputType: TimeEnum = .minute
+    @FocusState private var inputIsFocused : Bool
     
     var computedInput: Double {
         switch inputType {
@@ -45,6 +46,9 @@ struct ContentView: View {
             Form {
                 Section {
                     TextField("Amount", value: $inputTime, formatter: formatter)
+                        .keyboardType(.decimalPad)
+                        .focused($inputIsFocused)
+                    
                     Picker("Input Type", selection: $inputType) {
                         ForEach(TimeEnum.allCases, id: \.self) {
                             Text($0.rawValue)
@@ -71,6 +75,15 @@ struct ContentView: View {
                 }
             }
             .navigationTitle("Time Converter")
+            .toolbar {
+                ToolbarItemGroup(placement: .keyboard) {
+                    Spacer()
+                    
+                    Button("Done") {
+                        inputIsFocused = false
+                    }
+                }
+            }
         }
     }
 }

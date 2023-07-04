@@ -16,17 +16,29 @@ struct ContentView: View {
     @State private var correctAnswer = Int.random(in: 0...2)
     @State private var score = 0
     @State private var gameCount = 0
+    @State private var flagClickedNumber = -1
+    @State private var animate = false
     
     @State private var alertMessage = ""
     
     struct FlagImage: View {
         var flag: String
+        var flagNumber: Int
+        var clickedNumber: Int
+        var animate: Bool
         
         var body: some View {
             Image(flag)
                 .renderingMode(.original)
                 .clipShape(Capsule())
                 .shadow(radius: 5)
+                .rotation3DEffect(.degrees(animate && (flagNumber == clickedNumber) ? 360 : 0), axis: (x: 0, y: 1, z: 0))
+                .opacity(animate && (flagNumber != clickedNumber) ? 0.25 : 1)
+                .rotation3DEffect(
+                    .degrees(animate && (flagNumber != clickedNumber) ? 180 : 0),
+                                          axis: (x: 0.0, y: 0.0, z: 1.0)
+                )
+                .animation(.default, value: animate)
         }
     }
     
@@ -54,10 +66,12 @@ struct ContentView: View {
                     
                     ForEach(0..<3) { number in
                         Button {
+                            animate = true
                             flagTapped(number)
                         } label: {
-                            FlagImage(flag: countries[number])
+                            FlagImage(flag: countries[number], flagNumber: number, clickedNumber: flagClickedNumber, animate: animate)
                         }
+
                     }
                 }
                 .frame(maxWidth: .infinity)
@@ -89,6 +103,7 @@ struct ContentView: View {
     }
     
     func flagTapped(_ number: Int) {
+        flagClickedNumber = number
         if number == correctAnswer {
             scoreTitle = "Correct"
             score += 1
@@ -109,6 +124,7 @@ struct ContentView: View {
     }
     
     func askQuestion() {
+        animate = false
         countries.shuffle()
         correctAnswer = Int.random(in: 0...2)
     }

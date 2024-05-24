@@ -13,27 +13,52 @@ struct ExpenseItem: Identifiable, Codable {
     let name: String
     let type: String
     let amount: Double
+    let currencyCode: String
 }
 
 @Observable
 class Expenses {
-    var items = [ExpenseItem]() {
+    var personalItems = [ExpenseItem]() {
         didSet {
-            if let encoded = try? JSONEncoder().encode(items) {
-                UserDefaults.standard.set(encoded, forKey: "Items")
+            if let encoded = try? JSONEncoder().encode(personalItems) {
+                UserDefaults.standard.set(encoded, forKey: "PersonalItems")
+            }
+        }
+    }
+    
+    var businessItems = [ExpenseItem]() {
+        didSet {
+            if let encoded = try? JSONEncoder().encode(businessItems) {
+                UserDefaults.standard.set(encoded, forKey: "BusinessItems")
             }
         }
     }
     
     init() {
-        if let savedItems = UserDefaults.standard.data(forKey: "Items") {
+        setPersonalItems()
+        setBusinessItems()
+    }
+    
+    func setPersonalItems() {
+        if let savedItems = UserDefaults.standard.data(forKey: "PersonalItems") {
             if let decodedItems = try? JSONDecoder().decode([ExpenseItem].self, from: savedItems) {
-                items = decodedItems
+                personalItems = decodedItems
                 return
             }
         }
         
-        items = []
+        personalItems = []
+    }
+    
+    func setBusinessItems() {
+        if let savedItems = UserDefaults.standard.data(forKey: "BusinessItems") {
+            if let decodedItems = try? JSONDecoder().decode([ExpenseItem].self, from: savedItems) {
+                businessItems = decodedItems
+                return
+            }
+        }
+        
+        businessItems = []
     }
 }
 
@@ -45,21 +70,44 @@ struct ContentView: View {
     var body: some View {
         NavigationStack {
             List {
-                ForEach(expenses.items) { item in
-                    HStack {
-                        VStack(alignment: .leading) {
-                            Text(item.name)
-                                .font(.headline)
+                Section("Personal Expenses") {
+                    ForEach(expenses.personalItems) { item in
+                        HStack {
+                            VStack(alignment: .leading) {
+                                Text(item.name)
+                                    .font(.headline)
+                                
+                                Text(item.type)
+                            }
                             
-                            Text(item.type)
+                            Spacer()
+                            
+                            Text(item.amount, format: .currency(code: item.currencyCode))
+                                .bold(item.amount > 100)
+                                .italic(item.amount > 10)
                         }
-                        
-                        Spacer()
-                        
-                        Text(item.amount, format: .currency(code: "USD"))
                     }
+                    .onDelete(perform: removePersonalItems)
                 }
-                .onDelete(perform: removeItems)
+                Section("Business Expenses") {
+                    ForEach(expenses.businessItems) { item in
+                        HStack {
+                            VStack(alignment: .leading) {
+                                Text(item.name)
+                                    .font(.headline)
+                                
+                                Text(item.type)
+                            }
+                            
+                            Spacer()
+                            
+                            Text(item.amount, format: .currency(code: item.currencyCode))
+                                .bold(item.amount > 100)
+                                .italic(item.amount > 10)
+                        }
+                    }
+                    .onDelete(perform: removeBusinessItems)
+                }
             }
             .navigationTitle("iExpense")
             .toolbar {
@@ -73,8 +121,12 @@ struct ContentView: View {
         }
     }
     
-    func removeItems(as offsets: IndexSet) {
-        expenses.items.remove(atOffsets: offsets)
+    func removePersonalItems(as offsets: IndexSet) {
+        expenses.personalItems.remove(atOffsets: offsets)
+    }
+    
+    func removeBusinessItems(as offsets: IndexSet) {
+        expenses.businessItems.remove(atOffsets: offsets)
     }
 }
 
